@@ -55,19 +55,31 @@ int main() {
             strcpy(crguments[i], arguments[i].c_str());
         }
 
-        cout << YELLOW << arguments.size() << RESET << endl;
-        cout << GREEN << command << RESET << endl;
-        execvp(command.c_str(), crguments);
+        // Fork it, make it, do it, makes us
+        // harder, better, faster, Stronger
+        pid_t childPID = fork();
+        if (childPID == 0) {
+          // Execute
+          // v: char array as arguments
+          // p: also search in $PATH
+          execvp(command.c_str(), crguments);
+
+          // Exit child pid
+          exit(childPID);
+        } else if (childPID == -1) {
+          throw "Could not fork process";
+        }
       }
     }
   } catch(const string &e) {
-    cerr << RED << e << endl;
+    cerr << RED << e << RESET << endl;
     return 1;
   } catch(const std::exception &e) {
-    cerr << RED << e.what() << endl;
-  } catch(...) {
-    cerr << RED << "Ein unbekannter Fehler ist aufgetreten." << endl;
+    cerr << RED << e.what() << RESET << endl;
     return 2;
+  } catch(...) {
+    cerr << RED << "An unknown error occured" << RESET << endl;
+    return 3;
   }
 
   return 0;
