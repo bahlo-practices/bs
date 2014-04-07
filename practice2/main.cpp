@@ -6,8 +6,6 @@
 using namespace std;
 
 int main() {
-  setlocale(0, "DE");
-
   try {
     string input = "";
     cout << BLUE << "Welcome to Trash! Exit with <logout>" << RESET << endl;
@@ -21,7 +19,6 @@ int main() {
         cout << "COMMAND: " << input << endl;
       }
     }
-    return 0;
   } catch(const string &e) {
     cerr << RED << e << endl;
     return 1;
