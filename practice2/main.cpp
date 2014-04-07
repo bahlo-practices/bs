@@ -59,7 +59,7 @@ int main() {
         string command = vector_shift(arguments);
 
         // Check if the last argument is '&'
-        if (arguments.at(arguments.size() -1) == "&") {
+        if (arguments.size() > 0 && arguments.at(arguments.size() -1) == "&") {
           forkIt = true;
 
           // Remove '&'
@@ -74,7 +74,7 @@ int main() {
         }
 
         // Fork it, make it, do it, makes us
-        // harder, better, faster, Stronger
+        // harder, better, faster, stronger
         pid_t childPID = fork();
         if (childPID == 0) {
           // Execute
