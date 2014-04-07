@@ -21,16 +21,26 @@ string vector_shift(vector<string> &v) {
   return shifted;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   try {
-    // Print emblem
+    bool debug = false;
+
+    // Check arguments
+    if (argc > 1) {
+      for (int i = 1;i < argc;++i) {
+        if (strncmp(argv[1], "debug", 5)) {
+          debug = true;
+        }
+      }
+    }
+
+    // Print emblem and welcome message
     cout << BLUE << " _______            _" << endl;
     cout <<         "|__   __|          | |" << endl;
     cout <<         "   | |_ __ __ _ ___| |__" << endl;
     cout <<         "   | | '__/ _` / __| '_ \\" << endl;
     cout <<         "   | | | | (_| \\__ \\ | | |" << endl;
     cout <<         "   |_|_|  \\__,_|___/_| |_|" << RESET << endl << endl;
-    // Print welcome message
     cout << BLUE << "Welcome to Trash! Exit with <logout>" << RESET << endl;
 
     while (true) {
@@ -42,7 +52,7 @@ int main() {
       getline(cin, input);
 
       if (input == "logout") {
-        break;
+        break; // free
       } else if (input != "") {
         int status;
         bool forkIt = false;

@@ -13,5 +13,8 @@ all:
 run: all
 	./${EXECUTABLE}
 
+debug: all
+	./${EXECUTABLE} debug
+
 clean:
 	rm `find . -name "*o"`
