@@ -10,6 +10,17 @@
 
 using namespace std;
 
+/**
+ * Helper function to shift values from an array
+ */
+string vector_shift(vector<string> &v) {
+  string shifted = v.at(0);
+  std::rotate(v.begin(), v.begin() + 1, v.end());
+  v.pop_back();
+
+  return shifted;
+}
+
 int main() {
   try {
     // Print emblem
@@ -34,10 +45,10 @@ int main() {
         break;
       } else if (input != "") {
         int status;
-        // Split string
-        istringstream iss(input);
+        bool forkIt = false;
 
-        // Split into arguments
+        // Split string by space
+        istringstream iss(input);
         vector<string> arguments;
         copy(istream_iterator<string>(iss),
                  istream_iterator<string>(),
@@ -45,9 +56,15 @@ int main() {
 
         // Rotate vector to the left, to get the command (first item)
         // at the end, so we can pop_back it
-        string command = arguments.at(0);
-        std::rotate(arguments.begin(), arguments.begin() + 1, arguments.end());
-        arguments.pop_back();
+        string command = vector_shift(arguments);
+
+        // Check if the last argument is '&'
+        if (arguments.at(arguments.size() -1) == "&") {
+          forkIt = true;
+
+          // Remove '&'
+          arguments.pop_back();
+        }
 
         // Transform arguments vector<string> to char *const *
         char ** crguments = new char*[arguments.size()];
@@ -68,7 +85,9 @@ int main() {
           // Exit child pid
           exit(childPID);
         } else  {
-          waitpid(childPID, &status, 0);
+          if (forkIt) {
+            waitpid(childPID, &status, 0);
+          }
         }
       }
     }
