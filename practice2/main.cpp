@@ -10,13 +10,6 @@
 
 using namespace std;
 
-// Helper function to convert from string to char
-char *convert(const std::string & s) {
-   char *pc = new char[s.size()+1];
-   std::strcpy(pc, s.c_str());
-   return pc;
-}
-
 int main() {
   try {
     string input = "";
@@ -48,8 +41,8 @@ int main() {
                  istream_iterator<string>(),
                  back_inserter<vector<string> >(arguments));
 
-        // Rotate vector to the left, to get the command at the end,
-        // so we can pop_back it
+        // Rotate vector to the left, to get the command (first item)
+        // at the end, so we can pop_back it
         string command = arguments.at(0);
         std::rotate(arguments.begin(), arguments.begin() + 1, arguments.end());
         arguments.pop_back();
