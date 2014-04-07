@@ -12,8 +12,6 @@ using namespace std;
 
 int main() {
   try {
-    string input = "";
-
     // Print emblem
     cout << BLUE << " _______            _" << endl;
     cout <<         "|__   __|          | |" << endl;
@@ -25,14 +23,17 @@ int main() {
     cout << BLUE << "Welcome to Trash! Exit with <logout>" << RESET << endl;
 
     while (true) {
+      string input = "";
       cout << "$ ";
-      cin >> input;
+
+      // Get command
+      // cin >> input would stop reading at spaces
+      getline(cin, input);
 
       if (input == "logout") {
         break;
       } else if (input != "") {
         // Split string
-        input = "ls -la /home/arne";
         istringstream iss(input);
 
         // Split into arguments
