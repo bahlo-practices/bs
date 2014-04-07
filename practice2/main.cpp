@@ -33,6 +33,7 @@ int main() {
       if (input == "logout") {
         break;
       } else if (input != "") {
+        int status;
         // Split string
         istringstream iss(input);
 
@@ -66,8 +67,8 @@ int main() {
 
           // Exit child pid
           exit(childPID);
-        } else if (childPID == -1) {
-          throw "Could not fork process";
+        } else  {
+          waitpid(childPID, &status, 0);
         }
       }
     }
