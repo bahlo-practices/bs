@@ -2,13 +2,15 @@
 #include <iomanip>
 #include <exception>
 
+#include "colors.h"
+
 using namespace std;
 
 int main() {
   setlocale(0, "DE");
 
   try {
-    cout << "Welcome to Trash! Exit with <logout>" << endl;
+    cout << BLUE << "Welcome to Trash! Exit with <logout>" << RESET << endl;
   } catch(const string &e) {
     cerr << e << endl;
     return 1;
