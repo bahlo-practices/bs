@@ -23,7 +23,7 @@ string vector_shift(vector<string> &v) {
 
 int main(int argc, char* argv[]) {
   try {
-    bool debug = false;
+    bool debug = true;
 
     // Check arguments
     if (argc > 1) {
@@ -64,6 +64,14 @@ int main(int argc, char* argv[]) {
         copy(istream_iterator<string>(iss),
              istream_iterator<string>(),
              back_inserter<vector<string> >(arguments));
+
+        if (debug) {
+          cout << YELLOW << "Arguments: " << endl;
+          for(size_t i = 0; i < arguments.size(); ++i) {
+            cout << " -- " << arguments.at(i) << endl;
+          }
+          cout << RESET;
+        }
 
         // Rotate vector to the left, to get the command (first item)
         // at the end, so we can pop_back it
