@@ -15,7 +15,7 @@ using namespace std;
  */
 string vector_shift(vector<string> &v) {
   string shifted = v.at(0);
-  std::rotate(v.begin(), v.begin() + 1, v.end());
+  rotate(v.begin(), v.begin() + 1, v.end());
   v.pop_back();
 
   return shifted;
