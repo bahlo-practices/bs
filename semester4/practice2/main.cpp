@@ -14,26 +14,28 @@ vector<string> split_str(string input, char delimiter) {
   vector<string> splitted;
   size_t pos = input.find(delimiter);
 
-  // Check if we have only one parameter
+  // Check if we have only one parameter, if yes, return it
   if (pos == input.npos) {
-    pos = input.size();
+    splitted.push_back(input);
+    return splitted;
   }
 
-  // Add first parameter
-  string first = input.substr(0, pos);
-  if (first.size() > 0) {
-    splitted.push_back(first);
-  }
-
-  // Get all others
+  // Get all other parameters
   size_t start = 0;
-  while (pos != input.npos) {
+  string arg = "";
+  while (pos < input.size()) {
     start = pos + 1;
     pos = input.find(delimiter, start);
-    string tmp = input.substr(start, pos - start);
-    cout << pos << tmp << endl;
-    if (tmp.size() > 0) {
-      splitted.push_back(tmp);
+
+    if (pos == input.npos) {
+      // We're at the end
+      pos = input.size();
+    }
+
+    arg = input.substr(start, pos - start);
+
+    if (arg.size() > 0) {
+      splitted.push_back(arg);
     }
   }
 
