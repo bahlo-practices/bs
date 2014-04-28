@@ -51,11 +51,12 @@ int main(int argc, char* argv[]) {
         }
 
         // Transform arguments vector<string> to char *const *
-        char ** crguments = new char*[arguments.size()];
+        char ** crguments = new char*[arguments.size() + 1];
         for(size_t i = 0; i < arguments.size(); ++i){
             crguments[i] = new char[arguments[i].size() + 1];
             strcpy(crguments[i], arguments[i].c_str());
         }
+        crguments[arguments.size() + 1] = NULL;
 
         // Fork it, make it, do it, makes us
         // harder, better, faster, stronger
