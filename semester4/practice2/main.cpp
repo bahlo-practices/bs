@@ -18,6 +18,8 @@ vector<string> split_str(string input, char delimiter) {
   if (pos == input.npos) {
     splitted.push_back(input);
     return splitted;
+  } else {
+    splitted.push_back(input.substr(0, pos));
   }
 
   // Get all other parameters
