@@ -10,17 +10,6 @@
 
 using namespace std;
 
-/**
- * Helper function to shift values from an array
- */
-string vector_shift(vector<string> &v) {
-  string shifted = v.at(0);
-  rotate(v.begin(), v.begin() + 1, v.end());
-  v.pop_back();
-
-  return shifted;
-}
-
 int main(int argc, char* argv[]) {
   try {
     // Print emblem and welcome message
@@ -53,11 +42,6 @@ int main(int argc, char* argv[]) {
              istream_iterator<string>(),
              back_inserter<vector<string> >(arguments));
 
-        // Rotate vector to the left, to get the command (first item)
-        // at the end, so we can pop_back it
-        string command_str = vector_shift(arguments);
-        const char *command = command_str.c_str();
-
         // Check if the last argument is '&'
         if (arguments.size() > 0 && arguments.at(arguments.size() -1) == "&") {
           forkIt = true;
@@ -78,9 +62,9 @@ int main(int argc, char* argv[]) {
         pid_t childPID = fork();
         if (childPID == 0) {
           // Execute
-          // v: char array as arguments
+          // v: char pointer array as arguments
           // p: also search in $PATH
-          execvp(command, crguments);
+          execvp(crguments[0], crguments);
 
           // Exit child pid
           exit(childPID);
