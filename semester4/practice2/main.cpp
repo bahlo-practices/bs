@@ -60,18 +60,24 @@ int main(int argc, char* argv[]) {
         // Fork it, make it, do it, makes us
         // harder, better, faster, stronger
         pid_t childPID = fork();
-        if (childPID == 0) {
-          // Execute
-          // v: char pointer array as arguments
-          // p: also search in $PATH
-          execvp(crguments[0], crguments);
+        switch (childPID) {
+          case -1:
+            cerr << "[" << childPID << "]" << " Error creating child process" << endl;
+          case 0:
+            // We're at the child process
+            // Execute
+            // v: char pointer array as arguments
+            // p: also search in $PATH
+            execvp(crguments[0], crguments);
 
-          // Exit child pid
-          exit(childPID);
-        } else  {
-          if (forkIt) {
-            waitpid(childPID, &status, 0);
-          }
+            // Exit child pid
+            exit(childPID);
+            break;
+          default:
+            if (!forkIt) {
+              waitpid(childPID, &status, 0);
+            }
+            break;
         }
       }
     }
