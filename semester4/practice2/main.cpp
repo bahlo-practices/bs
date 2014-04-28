@@ -10,6 +10,17 @@
 
 using namespace std;
 
+vector<string> split_str(string input, char delimiter) {
+  istringstream iss(input);
+  vector<string> arguments;
+
+  copy(istream_iterator<string>(iss),
+       istream_iterator<string>(),
+       back_inserter<vector<string> >(arguments));
+
+  return arguments;
+}
+
 int main(int argc, char* argv[]) {
   try {
     // Print emblem and welcome message
@@ -36,11 +47,7 @@ int main(int argc, char* argv[]) {
         bool forkIt = false;
 
         // Split string by space
-        istringstream iss(input);
-        vector<string> arguments;
-        copy(istream_iterator<string>(iss),
-             istream_iterator<string>(),
-             back_inserter<vector<string> >(arguments));
+        vector<string> arguments = split_str(input, ' ');
 
         // Check if the last argument is '&'
         if (arguments.size() > 0 && arguments.at(arguments.size() -1) == "&") {
@@ -56,7 +63,7 @@ int main(int argc, char* argv[]) {
             crguments[i] = new char[arguments[i].size() + 1];
             strcpy(crguments[i], arguments[i].c_str());
         }
-        crguments[arguments.size() + 1] = NULL;
+        crguments[arguments.size() + 1] = NULL; // Null-terminate array
 
         // Fork it, make it, do it, makes us
         // harder, better, faster, stronger
