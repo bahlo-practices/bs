@@ -23,17 +23,6 @@ string vector_shift(vector<string> &v) {
 
 int main(int argc, char* argv[]) {
   try {
-    bool debug = true;
-
-    // Check arguments
-    if (argc > 1) {
-      for (int i = 1;i < argc;++i) {
-        if (strncmp(argv[1], "debug", 5)) {
-          debug = true;
-        }
-      }
-    }
-
     // Print emblem and welcome message
     cout << BLUE << " _______            _" << endl;
     cout <<         "|__   __|          | |" << endl;
@@ -58,30 +47,19 @@ int main(int argc, char* argv[]) {
         bool forkIt = false;
 
         // Split string by space
-        if (debug) cout << YELLOW << "Parsing arguments.." << endl;
         istringstream iss(input);
         vector<string> arguments;
         copy(istream_iterator<string>(iss),
              istream_iterator<string>(),
              back_inserter<vector<string> >(arguments));
 
-        if (debug) {
-          cout << YELLOW << "Arguments: " << endl;
-          for(size_t i = 0; i < arguments.size(); ++i) {
-            cout << " -- " << arguments.at(i) << endl;
-          }
-          cout << RESET;
-        }
-
         // Rotate vector to the left, to get the command (first item)
         // at the end, so we can pop_back it
-        if (debug) cout << YELLOW << "Shifting arguments.." << endl;
-        string command = vector_shift(arguments);
+        string command_str = vector_shift(arguments);
+        const char *command = command_str.c_str();
 
         // Check if the last argument is '&'
-        if (debug) cout << YELLOW << "Checking for &.." << endl;
         if (arguments.size() > 0 && arguments.at(arguments.size() -1) == "&") {
-          if (debug) cout << YELLOW << "Found &, set fork flag" << endl;
           forkIt = true;
 
           // Remove '&'
@@ -89,7 +67,6 @@ int main(int argc, char* argv[]) {
         }
 
         // Transform arguments vector<string> to char *const *
-        if (debug) cout << YELLOW << "Transform vector to char array.." << endl;
         char ** crguments = new char*[arguments.size()];
         for(size_t i = 0; i < arguments.size(); ++i){
             crguments[i] = new char[arguments[i].size() + 1];
@@ -100,17 +77,15 @@ int main(int argc, char* argv[]) {
         // harder, better, faster, stronger
         pid_t childPID = fork();
         if (childPID == 0) {
-          if (debug) cout << YELLOW << "Executing.." << endl;
           // Execute
           // v: char array as arguments
           // p: also search in $PATH
-          execvp(command.c_str(), crguments);
+          execvp(command, crguments);
 
           // Exit child pid
           exit(childPID);
         } else  {
           if (forkIt) {
-            if (debug) cout << YELLOW << "Waiting for process.." << endl;
             waitpid(childPID, &status, 0);
           }
         }
