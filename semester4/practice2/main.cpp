@@ -11,14 +11,33 @@
 using namespace std;
 
 vector<string> split_str(string input, char delimiter) {
-  istringstream iss(input);
-  vector<string> arguments;
+  vector<string> splitted;
+  size_t pos = input.find(delimiter);
 
-  copy(istream_iterator<string>(iss),
-       istream_iterator<string>(),
-       back_inserter<vector<string> >(arguments));
+  // Check if we have only one parameter
+  if (pos == input.npos) {
+    pos = input.size();
+  }
 
-  return arguments;
+  // Add first parameter
+  string first = input.substr(0, pos);
+  if (first.size() > 0) {
+    splitted.push_back(first);
+  }
+
+  // Get all others
+  size_t start = 0;
+  while (pos != input.npos) {
+    start = pos + 1;
+    pos = input.find(delimiter, start);
+    string tmp = input.substr(start, pos - start);
+    cout << pos << tmp << endl;
+    if (tmp.size() > 0) {
+      splitted.push_back(tmp);
+    }
+  }
+
+  return splitted;
 }
 
 int main(int argc, char* argv[]) {
