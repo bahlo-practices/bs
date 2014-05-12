@@ -16,6 +16,7 @@
 #include <signal.h>
 #include <iterator>
 #include <algorithm>
+
 using namespace std;
 
 pid_t mypid = 0;
@@ -53,12 +54,12 @@ void handle_SIGINT(int i) {
     //            if(mypid == pids.at(i)) break;
     //        }
     //    }
-    //    
-    //    
+    //
+    //
     //    if(find(pids.begin(),pids.end(), mypid) != pids.end()){
     //        pids.erase(find(pids.begin(),pids.end(), mypid) );
     //    }
-    //    
+    //
     //    cout<<"_____DEBUG: Deleting pid: "<<mypid<<" from Vector\n";
     cout<<"$";
     kill(mypid, SIGINT);
@@ -66,7 +67,7 @@ void handle_SIGINT(int i) {
 
 void handle_SIGSTOP(int i) {
     //cout << "caught SIGTSTP \n" << mypid;
-    
+
     //cout << "$" << mypid;
     kill(mypid, SIGSTOP);
 }
@@ -141,7 +142,7 @@ void executeProgram(string command) {
         //        cout << "args[" << i << "] = " << args[i] << ".\n";
     }
     execvp(args[0], args);
-    exit;
+    exit(0);
 }
 
 int main(int argc, char** argv) {
@@ -153,7 +154,6 @@ int main(int argc, char** argv) {
     signal(SIGTSTP, handle_SIGSTOP);
     signal(SIGCHLD, handle_SIGCHLD);
     signal(SIGCONT, handle_SIGCONT);
-
 
     string program = "";
     bool login = true;
@@ -192,6 +192,7 @@ int main(int argc, char** argv) {
                     executeProgram(program);
                     break;
                 default:
+                    setpgid(0, getpid());
                     childCounter++;
                     mypid = pid;
                     //cout << "[" << mypid << "]";
