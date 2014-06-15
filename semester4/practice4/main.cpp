@@ -1,14 +1,11 @@
-/*
- * File:   main.cpp
- * Author: fbi
- *
- * Created on 12. Juni 2014, 16:06
- */
 #include <cstdlib>
 #include <iostream>
 #include <math.h>
 #include <vector>
+
 using namespace std;
+
+// Variables
 struct doneAllocations {
   void * allocationStart;
   void * allocationEnd;
@@ -22,10 +19,8 @@ char charToWrite = 'a';
 char numberToWrite = '1';
 vector<doneAllocations> da;
 bool memorySizing = true;
-/*
- *
- */
 int allocationcounter = 0;
+
 void mystatus() {
   int totalAllocated = 0;
   int last = 0;
@@ -41,6 +36,7 @@ void mystatus() {
     << " Allocation-end: " << da.at(last).allocationEnd;
   cout << "\nmymalloc(" << da.at(last).size << "); in line   " << da.at(last).line;
 }
+
 void myinit(unsigned int totalmem, int strategy) {
   strategie = strategy;
   void * first;
@@ -56,6 +52,7 @@ void myinit(unsigned int totalmem, int strategy) {
     }
   }
 }
+
 void mycleanup() {
   char * deleteIT = (char*) start;
   delete deleteIT;
@@ -64,6 +61,7 @@ void mycleanup() {
     da.pop_back();
   }
 }
+
 void *myalloc(unsigned int size, int line) {
   char* read = (char*) start;
   char* write;
@@ -131,6 +129,7 @@ void *myalloc(unsigned int size, int line) {
     if (size &&!(size & (size - 1))) {
       //zahl ist zweierpotenz
     } else { //size auf nächste zweier potenz aufrunden
+      // size <<= 1; // shift to right
       do {
         size++;
       } while (!size &&!(size & (size - 1)));
@@ -219,6 +218,7 @@ void *myalloc(unsigned int size, int line) {
   allocationcounter++;
   return start + placeToWrite;
 }
+
 void myfree(void *p) {
   //cout << "\n da size: " << da.size();
   char* read = (char*) p;
@@ -268,6 +268,7 @@ void myfree(void *p) {
     } while (!freed);
   }
 }
+
 void printMemory() {
   char * write = (char*) start;
   cout << "\n";
@@ -287,6 +288,7 @@ void testFirstFit() {
   //    char* test = (char*) a2;
   //    cout<<"\n a0: "<<*test;
 }
+
 void testBuddyAlgorithm() {
   void * a0 = myalloc(8, __LINE__);
   void * a1 = myalloc(8, __LINE__);
@@ -294,6 +296,7 @@ void testBuddyAlgorithm() {
   void * a2 = myalloc(4, __LINE__);
   void * a3 = myalloc(3, __LINE__);
 }
+
 int main(int argc, char** argv) {
   myinit(16, 1);
   testBuddyAlgorithm();
