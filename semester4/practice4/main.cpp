@@ -1,14 +1,19 @@
+/*
+ * File:   main.cpp
+ * Author: fbi
+ *
+ * Created on 12. Juni 2014, 16:06
+ */
 #include <cstdlib>
 #include <iostream>
 #include <math.h>
 #include <vector>
-
 using namespace std;
-
 struct doneAllocations {
   void * allocationStart;
   void * allocationEnd;
   int size;
+  int line;
 };
 void * start;
 int length;
@@ -17,17 +22,25 @@ char charToWrite = 'a';
 char numberToWrite = '1';
 vector<doneAllocations> da;
 bool memorySizing = true;
+/*
+ *
+ */
 int allocationcounter = 0;
-
 void mystatus() {
-  cout << "\nTotalmem: " << length << " Bytes";
+  int totalAllocated = 0;
+  int last = 0;
   for (int i = 0; i < da.size(); i++) {
-    cout << "\nAllocation: " << i;
-    cout << "\nAllocation-start: " << da.at(i).allocationStart
-      << " Allocation-end: " << da.at(i).allocationEnd;
+    totalAllocated = totalAllocated + da.at(i).size;
+    last = i;
   }
+  cout << "Start: " << start << "\tEnd: " << start + length;
+  cout << "\nTotalmem: " << length << " Bytes";
+  cout << "\nTotal allocated: " << totalAllocated << "Bytes";
+  cout << "\nAllocation: " << allocationcounter;
+  cout << "\nAllocation-start: " << da.at(last).allocationStart
+    << " Allocation-end: " << da.at(last).allocationEnd;
+  cout << "\nmymalloc(" << da.at(last).size << "); in line   " << da.at(last).line;
 }
-
 void myinit(unsigned int totalmem, int strategy) {
   strategie = strategy;
   void * first;
@@ -42,9 +55,7 @@ void myinit(unsigned int totalmem, int strategy) {
       write++;
     }
   }
-  cout << "Start: " << start << "\tEnd: " << start + length;
 }
-
 void mycleanup() {
   char * deleteIT = (char*) start;
   delete deleteIT;
@@ -53,7 +64,6 @@ void mycleanup() {
     da.pop_back();
   }
 }
-
 void *myalloc(unsigned int size, int line) {
   char* read = (char*) start;
   char* write;
@@ -78,12 +88,19 @@ void *myalloc(unsigned int size, int line) {
         read++;
       }
     }
-    //cout<<"\nEMPTY: "<<empty;
   }
   //buddy algorithmus - Initialisiere Speicher mit verschiedenen Zahlen für die Unterteilung
   if (strategie == 1) {
-    int k = log2(length);
-    int newlength = length;
+    int k, newlength;
+
+    if (length &&!(length & (length - 1))) {
+      k = log2(length);
+      newlength = length;
+    } else { //size auf nächste zweier potenz aufrunden
+      k = 5;
+      newlength = length;
+    }
+    //SPEICHEREINTEILUNG HIER NOCH: fall speicher bereich keine zweier potenz
     if (memorySizing) { // im ersten Schritt ist dies die speicher unterteilung
       bool firstRun = true;
       for (int i = 0; i < k; i++) {
@@ -102,28 +119,83 @@ void *myalloc(unsigned int size, int line) {
             read++;
           }
         }
-        numberToWrite++;
+        if (numberToWrite == '9') {
+          numberToWrite == '1';
+        } else {
+          numberToWrite++;
+        }
       }
       memorySizing = false;
     }
-
-    read = (char*) start;
-    //aktuelle belegung
-
-    // HIER BAUSTELLE, PRÜFEN OB SPEICHER BEREICHE GROSS GENUG, SONST VERGRÖSSERN UND ZUSAMMENFÜGEN
-
-    for (int i = 0; i < length; i++) { //<-- DÜRFTE MIST SEIN
-      if (*read != numberToWrite) {
-        empty++;
-        read++;
+    //PRÜFUNG AUF ZWEIER POTENZ
+    if (size &&!(size & (size - 1))) {
+      //zahl ist zweierpotenz
+    } else { //size auf nächste zweier potenz aufrunden
+      do {
+        size++;
+      } while (!size &&!(size & (size - 1)));
+    }
+    //BELEGUNG
+    char * search = (char*) start;
+    int searchCounter = 0;
+    int totallength = 0;
+    bool writeNow = false;
+    if (da.size() != 0) {
+      for (int z = 0; z < da.size(); z++) {
+        totallength = totallength + da.at(z).size;
       }
-      if (empty == size) {
-        placeToWrite = i - empty + 1;
-        cout << "\nplaceToWrite: " << placeToWrite;
-        bwrite = true;
-        i = size;
-        break;
+      for (int i = 0; i < length; i++) {
+        if (writeNow) {
+          bwrite = true;
+          break;
+        }
+        for (int i = 0; i < da.size(); i++) { // wenn speicherbereich belegt;
+          if (size > (length - totallength)) {
+            break;
+          }
+          if (da.at(i).allocationStart == search) {
+            search = search + da.at(i).size;
+            searchCounter++;
+            //cout<<"Speicherbereich belegt";
+          } else { //finde passenden speicherplatz
+            search++;
+            read = (char*) search;
+            for (int j = 0; j < size; j++) {
+              if (*read == *search) {
+                empty++;
+                read++;
+              }
+              if (empty == size) {
+                for (int a = 0; a < searchCounter; a++) {
+                  placeToWrite = placeToWrite + da.at(a).size;
+                }
+                cout << "\nplaceToWrite: " << placeToWrite;
+                writeNow = true;
+                bwrite = true;
+                i = size;
+                break;
+              }
+              if (*read != *search) { // falls grenze von freiem speicherbereich erreicht
+                bool found = false;
+                char * temp = read;
+                search = (char*) start;
+                for (int c = 0; c < da.size(); c++) { // wenn speicherbereich belegt;
+                  if (da.at(c).allocationStart == read) {
+                    found = true;
+                  }
+                }
+                if (found) {
+                } else {
+                  search = read;
+                }
+              }
+            }
+          }
+        }
       }
+    } else { //falls noch keine allocationen durchgeführt wurden
+      placeToWrite = 0;
+      bwrite = true;
     }
   }
   if (bwrite) {
@@ -134,31 +206,32 @@ void *myalloc(unsigned int size, int line) {
       write++;
     }
   }
-  doneAllocations da0;
-  da0.allocationStart = start + placeToWrite;
-  da0.size = size;
-  da0.allocationEnd = start + placeToWrite + size;
-  da.push_back(da0);
+  if (bwrite) {
+    doneAllocations da0;
+    da0.allocationStart = start + placeToWrite;
+    da0.size = size;
+    da0.allocationEnd = start + placeToWrite + size;
+    da0.line = line;
+    da.push_back(da0);
+  }
   mystatus();
   charToWrite++;
   allocationcounter++;
   return start + placeToWrite;
 }
 void myfree(void *p) {
-  cout<<"\n da size: "<<da.size();
-
+  //cout << "\n da size: " << da.size();
   char* read = (char*) p;
   bool freed = false;
   char memory;
   //VECTOR LÖSCHEN
   vector<doneAllocations>::iterator it;
-  for(int i = 0; i < da.size(); i++){
-    if(da.at(i).allocationStart == p){
-      da.erase(da.begin()+i);
+  for (int i = 0; i < da.size(); i++) {
+    if (da.at(i).allocationStart == p) {
+      da.erase(da.begin() + i);
     }
   }
-
-  cout<<"\n da size new: "<<da.size();
+  //cout << "\n da size new: " << da.size();
   //SPEICHER BEREINIGEN
   if (strategie == 0) {
     if (*read != 'I') {
@@ -179,6 +252,9 @@ void myfree(void *p) {
   }
   if (strategie == 1) {
     numberToWrite--;
+    if (numberToWrite == '1') {
+      numberToWrite == '2';
+    }
     memory = *read;
     do {
       if (*read == memory) {
@@ -189,7 +265,7 @@ void myfree(void *p) {
         freed = true;
         break;
       }
-    }        while (!freed);
+    } while (!freed);
   }
 }
 void printMemory() {
@@ -198,23 +274,28 @@ void printMemory() {
   cout << "\n" << "länge: " << length << "\n";
   for (int i = 0; i < length; i++) {
     cout << *write;
-    write++;
+    ++write;
   }
 }
 void testFirstFit() {
   void * a0 = myalloc(8, __LINE__);
-  myfree(a0);
-  void * a1 = myalloc(2, __LINE__);
-  //myfree(a1);
-  void * a2 = myalloc(6, __LINE__);
+  //myfree(a0);
+  void * a1 = myalloc(8, __LINE__);
+  myfree(a1);
+  void * a2 = myalloc(4, __LINE__);
+  void * a3 = myalloc(4, __LINE__);
   //    char* test = (char*) a2;
   //    cout<<"\n a0: "<<*test;
 }
 void testBuddyAlgorithm() {
-  myalloc(2, __LINE__);
+  void * a0 = myalloc(8, __LINE__);
+  void * a1 = myalloc(8, __LINE__);
+  myfree(a0);
+  void * a2 = myalloc(4, __LINE__);
+  void * a3 = myalloc(3, __LINE__);
 }
 int main(int argc, char** argv) {
-  myinit(32, 1);
+  myinit(16, 1);
   testBuddyAlgorithm();
   //testFirstFit();
   printMemory();
