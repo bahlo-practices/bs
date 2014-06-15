@@ -120,7 +120,7 @@ void *myalloc(unsigned int size, int line) {
           }
         }
         if (numberToWrite == '9') {
-          numberToWrite == '1';
+          numberToWrite = '1';
         } else {
           numberToWrite++;
         }
